@@ -81,28 +81,32 @@
   background: linear-gradient(to right, #5b21b6, #7c3aed);
   color: white;
   text-align: center;
-  padding: 50px 20px;
+  padding: 40px 20px;
   border-radius: 12px;
   max-width: 1200px;
   margin: 0 auto 20px auto;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 .insights-card h2 {
-  font-size: 2.8rem; /* 更大 */
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 .insights-card p {
-  font-size: 1.6rem; /* 更大 */
-  line-height: 1.8;
+  font-size: 1rem;
+  line-height: 1.6;
   max-width: 900px;
   margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .insights-card h2 { font-size: 2.8rem; }
+  .insights-card p { font-size: 1.6rem; }
 }
 
 /* ===== 白色内容区 ===== */
 .dashboard-content {
   background: white;
-  padding: 30px;
+  padding: 20px;
   border-radius: 12px;
   max-width: 1200px;
   margin: 0 auto 20px auto;
@@ -112,104 +116,115 @@
 /* 筛选器 */
 .filters {
   display: flex;
-  gap: 20px;
-  margin-bottom: 24px;
+  flex-wrap: wrap; /* 小屏幕自动换行 */
+  gap: 12px;
+  margin-bottom: 20px;
 }
 .filters select {
+  flex: 1;
+  min-width: 140px;
   padding: 10px 14px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  font-size: 1.2rem; /* 更大 */
+  font-size: 1rem;
+}
+@media (min-width: 768px) {
+  .filters select { font-size: 1.2rem; }
 }
 
 /* 图表卡片布局 */
 .charts-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 16px;
 }
 .chart-card {
   background: #fff;
   border-radius: 10px;
-  padding: 24px;
+  padding: 20px;
   min-height: 140px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  font-size: 1.4rem; /* 字体加大 */
+  font-size: 1.2rem;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .chart-card.big {
-  grid-row: span 2;
-  min-height: 280px;
+  min-height: 220px;
+}
+@media (min-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  .chart-card.big {
+    grid-row: span 2;
+    min-height: 280px;
+  }
+  .chart-card { font-size: 1.4rem; }
 }
 
 /* ===== 场景模拟部分 ===== */
 .scenario-section {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
+@media (min-width: 900px) {
+  .scenario-section {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 .scenario-card {
   background: #ede9fe; /* 淡紫色卡片 */
-  padding: 28px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
 .scenario-card h3 {
-  font-size: 1.8rem; /* 更大 */
-  margin-bottom: 14px;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
   color: #4c1d95;
 }
 .scenario-card p, .scenario-card li {
-  font-size: 1.2rem; /* 更大 */
-  margin-bottom: 8px;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+@media (min-width: 768px) {
+  .scenario-card h3 { font-size: 1.8rem; }
+  .scenario-card p, .scenario-card li { font-size: 1.2rem; }
 }
 .scenario-card ul {
   padding-left: 18px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
+}
+.check-btn,
+.block-btn,
+.alt-btn {
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
 }
 .check-btn {
   background: #6366f1;
   color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  font-weight: 600;
 }
-.check-btn:hover {
-  background: #4338ca;
-}
+.check-btn:hover { background: #4338ca; }
 .block-btn {
   background: #22c55e;
   color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  font-weight: 600;
   margin-right: 10px;
 }
-.block-btn:hover {
-  background: #16a34a;
-}
+.block-btn:hover { background: #16a34a; }
 .alt-btn {
   background: #f3f4f6;
   color: #333;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1.2rem;
 }
-.alt-btn:hover {
-  background: #e5e7eb;
-}
+.alt-btn:hover { background: #e5e7eb; }
 </style>

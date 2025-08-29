@@ -91,7 +91,7 @@ const analyzeMessage = () => {
   background: #f3e8ff;
   min-height: 100vh;
   padding: 20px;
-  font-size: 1.2rem; /* 默认字体放大 */
+  font-size: 1rem; /* 默认字体 */
 }
 
 /* ===== 标题 ===== */
@@ -99,50 +99,53 @@ const analyzeMessage = () => {
   background: #7c3aed;
   color: white;
   text-align: center;
-  padding: 30px 20px;
+  padding: 24px 16px;
   border-radius: 12px;
   margin-bottom: 20px;
 }
 .header-card h2 {
-  font-size: 2.2rem; /* 标题更大 */
-  margin-bottom: 12px;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
 }
 .header-card p {
-  font-size: 1.3rem;
+  font-size: 1rem;
   line-height: 1.6;
+}
+@media (min-width: 768px) {
+  .header-card h2 { font-size: 2.4rem; }
+  .header-card p { font-size: 1.3rem; }
 }
 
 /* ===== 聊天区域 ===== */
 .chat-box {
   background: white;
   border-radius: 12px;
-  padding: 20px;
-  min-height: 350px;
+  padding: 16px;
+  min-height: 300px;
   max-width: 900px;
   margin: 0 auto 20px auto;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   overflow-y: auto;
-  font-size: 1.2rem; /* 聊天文字更大 */
+  font-size: 1rem;
+}
+@media (min-width: 768px) {
+  .chat-box { font-size: 1.2rem; padding: 20px; }
 }
 
 /* 单条消息包装 */
 .message-wrapper {
   display: flex;
   align-items: flex-start;
-  margin: 14px 0;
-  gap: 12px;
+  margin: 12px 0;
+  gap: 10px;
 }
-.message-wrapper.bot {
-  flex-direction: row;
-}
-.message-wrapper.user {
-  flex-direction: row-reverse;
-}
+.message-wrapper.bot { flex-direction: row; }
+.message-wrapper.user { flex-direction: row-reverse; }
 
 /* 头像 */
 .avatar {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
 }
 .user-avatar {
@@ -152,16 +155,20 @@ const analyzeMessage = () => {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1.4rem;
+  font-size: 1rem;
+}
+@media (min-width: 768px) {
+  .avatar { width: 50px; height: 50px; }
+  .user-avatar { font-size: 1.4rem; }
 }
 
 /* 消息气泡 */
 .message {
-  padding: 16px 20px;
+  padding: 12px 16px;
   border-radius: 12px;
-  max-width: 70%;
+  max-width: 90%; /* 小屏更宽一点 */
   word-break: break-word;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 .message.bot {
   background: #f5f3ff;
@@ -171,33 +178,40 @@ const analyzeMessage = () => {
   background: #e0e7ff;
   text-align: right;
 }
+@media (min-width: 768px) {
+  .message { font-size: 1.2rem; max-width: 70%; }
+}
 
 /* ===== 输入框 ===== */
 .input-box {
   display: flex;
-  justify-content: center;
-  gap: 12px;
+  flex-wrap: wrap; /* 小屏时按钮换行 */
+  gap: 10px;
   max-width: 900px;
   margin: 0 auto;
 }
 .input-box input {
   flex: 1;
-  padding: 14px;
+  padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 .input-box button {
   background: #7c3aed;
   color: white;
   border: none;
-  padding: 14px 20px;
+  padding: 12px 16px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 .input-box button:hover {
   background: #5b21b6;
+}
+@media (min-width: 768px) {
+  .input-box input { font-size: 1.2rem; }
+  .input-box button { font-size: 1.2rem; padding: 14px 20px; }
 }
 </style>

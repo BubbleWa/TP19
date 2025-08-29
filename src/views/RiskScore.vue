@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-// 未来可以在这里加 API 逻辑
+// 未来这里会接 API
 </script>
 
 <style scoped>
@@ -31,61 +31,64 @@
   background: #f3e8ff;   /* 淡紫色背景 */
   min-height: 100vh;
   padding: 100px 20px 20px; /* 上面留 100px 避免挡住导航栏 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* 标题部分 */
+/* ===== 标题部分 ===== */
 .risk-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  padding: 0 10px;
 }
 .risk-header h2 {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: bold;
   color: #4c1d95;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 .risk-header p {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   max-width: 700px;
   margin: 0 auto;
   color: #333;
+  line-height: 1.8;
 }
 
-/* 风险卡片 */
+/* ===== 风险卡片 ===== */
 .risk-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 40px;
+  gap: 24px;
   background: white;
-  padding: 40px;
+  padding: 40px 30px;
   border-radius: 16px;
   max-width: 900px;
-  margin: 0 auto;
+  width: 100%;
   box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  text-align: center;
 }
-
 .risk-image {
-  width: 200px;
+  width: 220px;
   height: auto;
 }
-
 .risk-info h3 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 .risk-info p {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
+  font-size: 1.3rem;
+  margin-bottom: 24px;
   color: #555;
 }
-
 .risk-btn {
   background: #facc15;
-  padding: 12px 24px;
+  padding: 14px 28px;
   border-radius: 10px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: bold;
   border: none;
   cursor: pointer;
@@ -94,5 +97,17 @@
 .risk-btn:hover {
   background: #eab308;
   transform: translateY(-2px);
+}
+
+/* ===== 自适应布局 (大屏幕左右排) ===== */
+@media (min-width: 768px) {
+  .risk-card {
+    flex-direction: row;
+    text-align: left;
+    justify-content: center;
+  }
+  .risk-info {
+    flex: 1;
+  }
 }
 </style>
