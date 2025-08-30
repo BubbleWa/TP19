@@ -1,230 +1,190 @@
 <template>
   <div class="dashboard-page">
-    <!-- 紫色标题卡片 -->
-    <section class="insights-card">
-      <h2>Interactive Scam Insights</h2>
-      <p>
-        Filter by date, state, loss type, and age group to see what’s happening
-        near you, track losses, and spot trending scams—so you can act
-        before scammers do.
-      </p>
-    </section>
+    <div class="wrap">
+      <!-- State selector row -->
+      <section class="state-selector">
+        <button class="state-btn act">ACT</button>
+        <button class="state-btn nsw">NSW</button>
+        <button class="state-btn nt">NT</button>
+        <button class="state-btn qld">QLD</button>
+        <button class="state-btn sa">SA</button>
+        <button class="state-btn vic">VIC</button>
+        <button class="state-btn wa">WA</button>
+        <button class="state-btn tas">TAS</button>
+      </section>
 
-    <!-- 白色内容区 -->
-    <section class="dashboard-content">
-      <!-- 筛选器 -->
-      <div class="filters">
-        <select><option>Date Range</option></select>
-        <select><option>State</option></select>
-        <select><option>Loss Type</option></select>
-        <select><option>Age Group</option></select>
-      </div>
+      <!-- Breaking news -->
+      <section class="breaking-row">
+        <span>BREAKING NEWS</span>
+        <span>BREAKING NEWS</span>
+        <span>BREAKING NEWS</span>
+      </section>
 
-      <!-- 图表卡片布局 -->
-      <div class="charts-grid">
-        <div class="chart-card big">Reports & Losses</div>
-        <div class="chart-card">States</div>
-        <div class="chart-card">Total Reports</div>
-        <div class="chart-card">Devices</div>
-        <div class="chart-card">Age Groups</div>
-        <div class="chart-card">Scams by Type</div>
-      </div>
-    </section>
+      <!-- Top row: left / middle / right -->
+      <section class="top-row-grid">
+        <div class="card">
+          <div class="card-head">
+            <select class="scam-select"><option>Scam type</option></select>
+          </div>
+          <h3>Total Losses</h3>
+          <p class="number">167B</p>
+        </div>
 
-    <!-- 底部场景模拟 + 报告 -->
-    <section class="scenario-section">
-      <div class="scenario-card">
-        <h3>Scenario Check</h3>
-        <p>
-          You receive an SMS: Australia Post – Delivery Notice. Parcel on hold. 
-          Update address: <a href="#">https://auspost.live/Parcel</a>  
-          Reply “Y” within 24 hours.
-        </p>
-        <p><strong>What’s the safest next step?</strong></p>
-        <ul>
-          <li>A: Tap link & verify address</li>
-          <li>B: Open official AusPost app / website and check tracking</li>
-          <li>C: Reply “Y” to activate link</li>
-        </ul>
-        <button class="check-btn">Check Answer</button>
-      </div>
+        <div class="card big">
+          <h3 class="center">20% Likely to Get Scam</h3>
+          <p class="center subt">2 out of 10 faced financial loss through scam</p>
+          <div class="chart-placeholder">[ Chart Placeholder ]</div>
+        </div>
 
-      <div class="scenario-card">
-        <h3>Open official AusPost app / website and check tracking</h3>
-        <p><strong>What’s correct:</strong></p>
-        <ul>
-          <li>Look-alike link</li>
-          <li>Sense of urgency</li>
-          <li>Request to reply</li>
-          <li>Unknown number</li>
-        </ul>
-        <button class="block-btn">Report & Block</button>
-        <button class="alt-btn">Try another scenario</button>
-      </div>
-    </section>
+        <div class="card">
+          <h3>Top Scams by Loss</h3>
+          <ul class="list">
+            <li>Investment scams #####</li>
+            <li>Phishing attempts #####</li>
+            <li>#####</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Bottom row: map placeholder + three mini cards -->
+      <section class="bottom-grid">
+        <div class="map-card">[ Map Placeholder ]</div>
+      
+        <div class="mini-card">Age Groups</div>
+        <div class="mini-card">Scams by Type</div>
+      </section>
+    </div>
   </div>
 </template>
 
-<script setup>
-// 以后这里会接 API 替换内容
-</script>
-
 <style scoped>
+/* Page wrapper */
 .dashboard-page {
-  background: #f3e8ff; /* 整个背景淡紫色 */
   min-height: 100vh;
-  padding: 20px;
+  background: #f7f7fb;
+  padding: 24px 12px;
 }
-
-/* ===== 紫色标题卡片 ===== */
-.insights-card {
-  background: linear-gradient(to right, #5b21b6, #7c3aed);
-  color: white;
-  text-align: center;
-  padding: 40px 20px;
-  border-radius: 12px;
-  max-width: 1200px;
-  margin: 0 auto 20px auto;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-.insights-card h2 {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
-.insights-card p {
-  font-size: 1rem;
-  line-height: 1.6;
-  max-width: 900px;
+.wrap {
+  max-width: 1240px;
   margin: 0 auto;
 }
-@media (min-width: 768px) {
-  .insights-card h2 { font-size: 2.8rem; }
-  .insights-card p { font-size: 1.6rem; }
-}
 
-/* ===== 白色内容区 ===== */
-.dashboard-content {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 1200px;
-  margin: 0 auto 20px auto;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-/* 筛选器 */
-.filters {
-  display: flex;
-  flex-wrap: wrap; /* 小屏幕自动换行 */
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.filters select {
-  flex: 1;
-  min-width: 140px;
-  padding: 10px 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-@media (min-width: 768px) {
-  .filters select { font-size: 1.2rem; }
-}
-
-/* 图表卡片布局 */
-.charts-grid {
+/* State selector grid */
+.state-selector {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-.chart-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  min-height: 140px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  font-size: 1.2rem;
-  font-weight: bold;
-  display: flex;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 14px;
   align-items: center;
-  justify-content: center;
+  margin-bottom: 16px;
 }
-.chart-card.big {
+.state-btn {
+  height: 64px;
+  border-radius: 999px;
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+}
+.act { background:#3b82f6; }
+.nsw { background:#b91c1c; }
+.nt  { background:#ea580c; }
+.qld { background:#f59e0b; }
+.sa  { background:#ef4444; }
+.vic { background:#6366f1; }
+.wa  { background:#f59e0b; }
+.tas { background:#10b981; }
+
+/* Breaking news bar */
+.breaking-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin: 10px 0 22px;
+}
+.breaking-row span {
+  background:#ef4444;
+  color:#fff;
+  font-weight: 800;
+  padding: 8px 14px;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(239,68,68,.35);
+}
+
+/* Top row: 3-column layout */
+.top-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+/* Card styles */
+.card, .mini-card, .map-card {
+  background: #4f86ff;
+  color: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.18);
+}
+.card h3 { margin: 6px 0 8px; font-size: 1.1rem; font-weight: 800; }
+.card .number { font-size: 2.4rem; font-weight: 800; margin-top: 16px; }
+.card .list { padding-left: 18px; line-height: 1.6; }
+.card .center { text-align: center; }
+.card .subt { opacity: .95; margin-bottom: 8px; }
+
+.card.big {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-height: 220px;
 }
-@media (min-width: 900px) {
-  .charts-grid {
-    grid-template-columns: 2fr 1fr 1fr;
-    grid-template-rows: auto auto;
-  }
-  .chart-card.big {
-    grid-row: span 2;
-    min-height: 280px;
-  }
-  .chart-card { font-size: 1.4rem; }
+.chart-placeholder {
+  margin: 14px auto 0;
+  width: 88%;
+  height: 120px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.15);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  letter-spacing: .5px;
 }
 
-/* ===== 场景模拟部分 ===== */
-.scenario-section {
+/* Bottom grid: map spans two columns */
+.bottom-grid {
+  margin-top: 18px;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
 }
-@media (min-width: 900px) {
-  .scenario-section {
-    grid-template-columns: 1fr 1fr;
-  }
+.mini-card {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.05rem;
 }
-.scenario-card {
-  background: #ede9fe; /* 淡紫色卡片 */
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+.map-card {
+  grid-column: span 2;
+  min-height: 240px;   /* larger area for future map */
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.1rem;
 }
-.scenario-card h3 {
-  font-size: 1.4rem;
-  margin-bottom: 10px;
-  color: #4c1d95;
-}
-.scenario-card p, .scenario-card li {
-  font-size: 1rem;
-  margin-bottom: 6px;
-}
+
+/* Responsive breakpoints */
 @media (min-width: 768px) {
-  .scenario-card h3 { font-size: 1.8rem; }
-  .scenario-card p, .scenario-card li { font-size: 1.2rem; }
+  .bottom-grid { grid-template-columns: repeat(3, 1fr); }
+  .map-card { grid-column: span 2; }
 }
-.scenario-card ul {
-  padding-left: 18px;
-  margin-bottom: 12px;
+@media (min-width: 1100px) {
+  .bottom-grid { grid-template-columns: repeat(4, 1fr); }
+  .map-card { grid-column: span 2; }
 }
-.check-btn,
-.block-btn,
-.alt-btn {
-  padding: 10px 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
+@media (max-width: 900px) {
+  .top-row-grid { grid-template-columns: 1fr; }
 }
-.check-btn {
-  background: #6366f1;
-  color: white;
-}
-.check-btn:hover { background: #4338ca; }
-.block-btn {
-  background: #22c55e;
-  color: white;
-  margin-right: 10px;
-}
-.block-btn:hover { background: #16a34a; }
-.alt-btn {
-  background: #f3f4f6;
-  color: #333;
-}
-.alt-btn:hover { background: #e5e7eb; }
 </style>
