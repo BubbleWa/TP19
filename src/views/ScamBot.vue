@@ -1,6 +1,6 @@
 <template>
   <div class="scambot-page">
-    <!-- header: unchanged -->
+    <!-- Purple header card -->
     <div class="header-card">
       <h2>🤖 ScamDetector</h2>
       <p>
@@ -9,39 +9,27 @@
       </p>
     </div>
 
-    <!-- two-column layout -->
+    <!-- Layout: now only the left document card -->
     <div class="risk-grid">
-      <!-- left: document card -->
       <section class="card doc-card">
+        <!-- Toolbar with title + paste -->
         <div class="doc-toolbar">
           <h3>Untitled document</h3>
           <button class="btn ghost" @click="pasteFromClipboard">Paste text</button>
         </div>
 
+        <!-- Input textarea -->
         <textarea
           v-model="userInput"
           class="doc-input"
           placeholder="Paste or type the message here..."
         ></textarea>
 
+        <!-- Actions -->
         <div class="doc-actions">
           <label class="btn light" for="fileInput">Upload screenshot</label>
           <input id="fileInput" type="file" class="hidden" accept="image/*,text/plain" @change="handleFile">
           <button class="btn primary" @click="analyze">Detect</button>
-        </div>
-      </section>
-
-      <!-- right: risk card with image -->
-      <section class="card gauge-card">
-        <p v-if="wordCount < 25" class="hint">Enter at least 25 words to show risk</p>
-
-        <div class="gauge-wrap">
-          <img class="meter-img" src="/risk-meter.png" alt="Risk meter" />
-          <div class="risk-text" :class="riskLevelClass">{{ riskLevel }}</div>
-          <div class="chip">
-            <span class="dot">!</span>
-            {{ likelihoodLabel }}
-          </div>
         </div>
       </section>
     </div>
@@ -49,64 +37,40 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
+import { ref } from "vue"
 
-const userInput = ref("")
-const score = ref(0) // 0–100
+const userInput = ref("") // User input text
+const score = ref(0)      // Risk score (0–100)
 
-const wordCount = computed(() =>
-  userInput.value.trim().split(/\s+/).filter(Boolean).length
-)
-
+// Simple analyze function
 function analyze() {
-  if (wordCount.value < 25) {
-    score.value = 0
-    return
-  }
   const text = userInput.value.toLowerCase()
-
-  const keywords = [
-    'verify','click','urgent','immediately','locked','password',
-    'social security','ssn','bank','transfer','gift','win','prize','link',
-    'confirm','account','update','address','login','suspend'
-  ]
-  let s = 15
-  keywords.forEach(k => { if (text.includes(k)) s += 6 })
-
-  if (/(https?:\/\/)?[^\s]+\.(ru|tk|top|xyz|click|zip|mov|live|icu|work)/.test(text)) s += 25
-  if (/http|www\./.test(text)) s += 10
-  if (/(full name|date of birth|dob|ssn|id|passport|credit card|cvv)/.test(text)) s += 25
-
-  score.value = Math.max(0, Math.min(100, s))
+  let s = 0
+  if (/urgent|password|bank|link|click/.test(text)) s += 20
+  score.value = Math.min(100, s)
 }
 
-const riskLevel = computed(() => {
-  if (score.value >= 70) return 'High'
-  if (score.value >= 40) return 'Medium'
-  return 'Low'
-})
-const riskLevelClass = computed(() => riskLevel.value.toLowerCase())
-const likelihoodLabel = computed(() => (score.value >= 40 ? 'Likely' : 'Unlikely'))
-
+// Paste text from clipboard
 async function pasteFromClipboard() {
   try {
     const txt = await navigator.clipboard.readText()
     if (txt) userInput.value = txt
   } catch (e) {
-    console.warn('Clipboard not available', e)
+    console.warn("Clipboard not available", e)
   }
 }
 
+// Handle file upload
 function handleFile(e) {
   const file = e.target.files?.[0]
   if (file) {
-    userInput.value += (userInput.value ? '\n\n' : '') + `[Uploaded file: ${file.name}]`
+    userInput.value += (userInput.value ? "\n\n" : "") + `[Uploaded file: ${file.name}]`
   }
 }
 </script>
 
 <style scoped>
-/* page */
+/* Page background */
 .scambot-page {
   background: #f3e8ff;
   min-height: 100vh;
@@ -114,7 +78,7 @@ function handleFile(e) {
   font-size: 1rem;
 }
 
-/* header */
+/* Purple header */
 .header-card {
   background: #7c3aed;
   color: white;
@@ -130,28 +94,23 @@ function handleFile(e) {
   .header-card p  { font-size: 1.3rem; }
 }
 
-/* grid */
+/* Grid: now only 1 column */
 .risk-grid {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
   display: grid;
-  gap: 20px;
-  grid-template-columns: 1fr;
-}
-@media (min-width: 960px) {
-  .risk-grid { grid-template-columns: 1.2fr 1fr; }
 }
 
-/* cards */
+/* Card */
 .card {
   background: #ffffff;
   border-radius: 14px;
   padding: 18px;
   box-shadow: 0 12px 28px rgba(17, 24, 39, .12);
 }
-.doc-card { overflow: hidden; }            /* fix: keep children inside rounded card */
+.doc-card { overflow: hidden; }
 
-/* left card */
+/* Toolbar */
 .doc-toolbar {
   display: flex;
   align-items: center;
@@ -159,6 +118,8 @@ function handleFile(e) {
   margin-bottom: 10px;
 }
 .doc-toolbar h3 { margin: 0; font-size: 1.1rem; color: #111827; }
+
+/* Textarea */
 .doc-input {
   width: 100%;
   min-height: 260px;
@@ -171,8 +132,10 @@ function handleFile(e) {
   font-size: 1rem;
   line-height: 1.6;
   color: #1f2937;
-  box-sizing: border-box;                  /* fix: prevent overflow from padding */
+  box-sizing: border-box;
 }
+
+/* Actions */
 .doc-actions {
   display: flex;
   gap: 12px;
@@ -181,7 +144,7 @@ function handleFile(e) {
 }
 .hidden { display: none; }
 
-/* buttons */
+/* Buttons */
 .btn {
   border: 0;
   border-radius: 10px;
@@ -197,49 +160,4 @@ function handleFile(e) {
 .btn.primary:hover { filter: brightness(1.05); }
 .btn.light { background: #f3f4f6; color: #374151; }
 .btn.ghost { background: #e9d5ff; color: #5b21b6; }
-
-/* right card */
-.hint {
-  text-align: center;
-  color: #6b7280;
-  font-weight: 600;
-  margin: 8px 0 12px;
-}
-.gauge-wrap {
-  display: grid;
-  place-items: center;
-  gap: 10px;
-}
-.meter-img {
-  width: 100%;
-  max-width: 420px;
-  height: auto;
-  display: block;
-  border-radius: 8px;
-}
-.risk-text { font-size: 1.8rem; font-weight: 800; }
-.risk-text.low    { color: #16a34a; }
-.risk-text.medium { color: #f59e0b; }
-.risk-text.high   { color: #ef4444; }
-
-.chip {
-  background: #eef2ff;
-  color: #111827;
-  font-weight: 700;
-  padding: 8px 12px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.chip .dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #111827;
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-size: .9rem;
-}
 </style>

@@ -1,190 +1,288 @@
 <template>
   <div class="dashboard-page">
     <div class="wrap">
-      <!-- State selector row -->
+      <!-- State selector -->
       <section class="state-selector">
-        <button class="state-btn act">ACT</button>
-        <button class="state-btn nsw">NSW</button>
-        <button class="state-btn nt">NT</button>
-        <button class="state-btn qld">QLD</button>
-        <button class="state-btn sa">SA</button>
-        <button class="state-btn vic">VIC</button>
-        <button class="state-btn wa">WA</button>
-        <button class="state-btn tas">TAS</button>
+        <button
+          v-for="s in states"
+          :key="s"
+          class="state-btn"
+          :class="{ active: s === selectedState }"
+          @click="selectState(s)"
+        >
+          {{ s }}
+        </button>
       </section>
 
       <!-- Breaking news -->
-      <section class="breaking-row">
-        <span>BREAKING NEWS</span>
-        <span>BREAKING NEWS</span>
-        <span>BREAKING NEWS</span>
+      <section class="breaking-row" v-if="breakingNews.length">
+        <span v-for="n in breakingNews" :key="n.contact_method">
+          {{ n.contact_method }}: {{ n.pct_change }}% ({{ n.window_years[4] }} → {{ n.window_years[0] }})
+        </span>
       </section>
 
-      <!-- Top row: left / middle / right -->
-      <section class="top-row-grid">
-        <div class="card">
-          <div class="card-head">
-            <select class="scam-select"><option>Scam type</option></select>
+      <!-- Filter row -->
+      <section class="filter-row">
+        <select v-model="selectedScamType" @change="loadStats" class="filter-select">
+          <option :value="null">All Scam Types</option>
+          <option v-for="t in scamTypes" :key="t" :value="t">{{ t }}</option>
+        </select>
+
+        <select v-model="selectedYear" @change="loadStats" class="filter-select">
+          <option :value="null">Last 5 years</option>
+          <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
+        </select>
+      </section>
+
+      <!-- Dashboard cards -->
+      <section class="dashboard-cards">
+        <!-- KPIs -->
+        <div class="kpi-card">
+          <i class="fas fa-money-bill-wave"></i>
+          <h4>Total Losses</h4>
+          <p class="kpi-number">${{ kpiTotalLosses.toLocaleString() }}</p>
+        </div>
+        <div class="kpi-card">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h4>Reported Scams</h4>
+          <p class="kpi-number">{{ kpiReportedScams.toLocaleString() }}</p>
+        </div>
+
+        <!-- Likelihood -->
+        <div class="likelihood-card">
+          <Doughnut v-if="donutChartData" :data="donutChartData" :options="donutOptions" />
+          <h3>{{ donutPercent }}% Likely to Get Scam</h3>
+          <div class="people-row">
+            <span
+              v-for="n in 10"
+              :key="n"
+              class="person"
+              :class="{ active: n <= peopleOutOf10 }"
+            >👤</span>
           </div>
-          <h3>Total Losses</h3>
-          <p class="number">167B</p>
+          <p>{{ peopleOutOf10 }} out of 10 faced financial loss</p>
         </div>
 
-        <div class="card big">
-          <h3 class="center">20% Likely to Get Scam</h3>
-          <p class="center subt">2 out of 10 faced financial loss through scam</p>
-          <div class="chart-placeholder">[ Chart Placeholder ]</div>
-        </div>
-
-        <div class="card">
-          <h3>Top Scams by Loss</h3>
-          <ul class="list">
-            <li>Investment scams #####</li>
-            <li>Phishing attempts #####</li>
-            <li>#####</li>
+        <!-- Top scams -->
+        <div class="top-scams-card">
+          <h3>Top Scams by Loss (2025)</h3>
+          <ul>
+            <li v-for="item in topScams" :key="item.category + item.contact_method">
+              <i class="fas fa-shield-alt"></i>
+              {{ item.category }} — {{ item.scam_type }} ({{ item.contact_method }})
+              <br />
+              Losses: ${{ item.losses.toLocaleString() }}
+            </li>
           </ul>
         </div>
-      </section>
-
-      <!-- Bottom row: map placeholder + three mini cards -->
-      <section class="bottom-grid">
-        <div class="map-card">[ Map Placeholder ]</div>
-      
-        <div class="mini-card">Age Groups</div>
-        <div class="mini-card">Scams by Type</div>
       </section>
     </div>
   </div>
 </template>
 
+<script setup lang="ts">
+import { ref, onMounted, computed } from "vue";
+import { getFilters, getStats } from "@/api/client";
+import type { FiltersResponse } from "@/api/types";
+
+// Chart.js
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from "chart.js";
+import { Doughnut } from "vue-chartjs";
+ChartJS.register(Title, Tooltip, Legend, ArcElement);
+
+// Filters
+const states = ref<string[]>([]);
+const scamTypes = ref<string[]>([]);
+const years = ref<number[]>([]);
+
+const selectedState = ref<string>("");
+const selectedScamType = ref<string | null>(null);
+const selectedYear = ref<number | null>(null);
+
+const kpiTotalLosses = ref(0);
+const kpiReportedScams = ref(0);
+const donutPercent = ref(0);
+const peopleOutOf10 = ref(0);
+const topScams = ref<any[]>([]);
+const breakingNews = ref<any[]>([]);
+
+async function loadFilters() {
+  const f: FiltersResponse = await getFilters();
+
+  // 去掉 "Outside of Australia" 和 "Unspecified"
+  states.value = f.states.filter(
+    s => s !== "Outside of Australia" && s !== "Unspecified"
+  );
+  scamTypes.value = f.scam_types;
+  years.value = f.years.list;
+
+  selectedState.value = states.value[0];
+  selectedScamType.value = null;
+  selectedYear.value = null;
+
+  await loadStats();
+}
+
+async function loadStats() {
+  const stats = await getStats({
+    state: selectedState.value,
+    scam_type: selectedScamType.value || undefined,
+    year: selectedYear.value || undefined,
+  });
+
+  kpiTotalLosses.value = stats.kpis?.total_losses ?? 0;
+  kpiReportedScams.value = stats.kpis?.reports ?? 0;
+  donutPercent.value = stats.likelihood?.likelihood_scammed_pct ?? 0;
+  peopleOutOf10.value = stats.likelihood?.likelihood_loss_per_10 ?? 0;
+  topScams.value = stats.top3_by_loss ?? [];
+  breakingNews.value = stats.breaking_news ?? [];
+}
+
+function selectState(s: string) {
+  selectedState.value = s;
+  loadStats();
+}
+
+const donutChartData = computed(() => ({
+  labels: ["Scammed", "Safe"],
+  datasets: [
+    {
+      data: [donutPercent.value, 100 - donutPercent.value],
+      backgroundColor: ["#10b981", "#374151"],
+      borderWidth: 0,
+    },
+  ],
+}));
+const donutOptions = {
+  responsive: true,
+  plugins: { legend: { display: false } },
+  cutout: "70%",
+};
+
+onMounted(loadFilters);
+</script>
+
 <style scoped>
-/* Page wrapper */
 .dashboard-page {
   min-height: 100vh;
-  background: #f7f7fb;
+  background: linear-gradient(to bottom right, #1e3a8a, #0f172a);
   padding: 24px 12px;
+  color: white;
+  font-family: "Segoe UI", sans-serif;
 }
 .wrap {
   max-width: 1240px;
   margin: 0 auto;
 }
 
-/* State selector grid */
+/* State buttons */
 .state-selector {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-  gap: 14px;
-  align-items: center;
-  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  justify-content: center;
 }
 .state-btn {
-  height: 64px;
-  border-radius: 999px;
-  border: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: #3b82f6;
   color: #fff;
-  font-weight: 700;
+  font-weight: bold;
+  border: none;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  transition: background 0.2s;
 }
-.act { background:#3b82f6; }
-.nsw { background:#b91c1c; }
-.nt  { background:#ea580c; }
-.qld { background:#f59e0b; }
-.sa  { background:#ef4444; }
-.vic { background:#6366f1; }
-.wa  { background:#f59e0b; }
-.tas { background:#10b981; }
+.state-btn:hover {
+  background: #2563eb;
+}
+.state-btn.active {
+  background: #1e40af;
+}
 
-/* Breaking news bar */
+/* Breaking news */
 .breaking-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px;
-  margin: 10px 0 22px;
+  gap: 10px;
+  margin: 10px 0 18px;
 }
 .breaking-row span {
-  background:#ef4444;
-  color:#fff;
-  font-weight: 800;
-  padding: 8px 14px;
+  background: #ef4444;
+  padding: 6px 12px;
   border-radius: 6px;
-  box-shadow: 0 6px 16px rgba(239,68,68,.35);
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,.2);
 }
 
-/* Top row: 3-column layout */
-.top-row-grid {
+/* Filter row */
+.filter-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+.filter-select {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,.2);
+}
+.filter-select option {
+  color: black;
+}
+
+/* Dashboard cards */
+.dashboard-cards {
   display: grid;
-  grid-template-columns: 1fr 1.4fr 1fr;
-  gap: 18px;
-  align-items: stretch;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  gap: 20px;
 }
-
-/* Card styles */
-.card, .mini-card, .map-card {
-  background: #4f86ff;
-  color: #fff;
+.kpi-card, .likelihood-card, .top-scams-card {
+  background: #1d4ed8;
   border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  box-shadow: 0 8px 16px rgba(0,0,0,.25);
+  text-align: center;
 }
-.card h3 { margin: 6px 0 8px; font-size: 1.1rem; font-weight: 800; }
-.card .number { font-size: 2.4rem; font-weight: 800; margin-top: 16px; }
-.card .list { padding-left: 18px; line-height: 1.6; }
-.card .center { text-align: center; }
-.card .subt { opacity: .95; margin-bottom: 8px; }
-
-.card.big {
+.kpi-card i {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+.kpi-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-top: 6px;
+}
+.people-row {
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  min-height: 220px;
+  gap: 4px;
+  font-size: 20px;
+  margin: 12px 0;
 }
-.chart-placeholder {
-  margin: 14px auto 0;
-  width: 88%;
-  height: 120px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.15);
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  letter-spacing: .5px;
-}
+.person { opacity: 0.3; }
+.person.active { opacity: 1; }
 
-/* Bottom grid: map spans two columns */
-.bottom-grid {
-  margin-top: 18px;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(2, 1fr);
+/* Top scams */
+.top-scams-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
 }
-.mini-card {
-  min-height: 120px;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 1.05rem;
-}
-.map-card {
-  grid-column: span 2;
-  min-height: 240px;   /* larger area for future map */
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 1.1rem;
-}
-
-/* Responsive breakpoints */
-@media (min-width: 768px) {
-  .bottom-grid { grid-template-columns: repeat(3, 1fr); }
-  .map-card { grid-column: span 2; }
-}
-@media (min-width: 1100px) {
-  .bottom-grid { grid-template-columns: repeat(4, 1fr); }
-  .map-card { grid-column: span 2; }
-}
-@media (max-width: 900px) {
-  .top-row-grid { grid-template-columns: 1fr; }
+.top-scams-card li {
+  margin: 12px 0;
 }
 </style>
